@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'steam' => [
+        'client_id' => null,
+        'client_secret' => env('STEAM_API_KEY'),
+        'redirect' => env('STEAM_REDIRECT_URI'),
+    ],
 ];
