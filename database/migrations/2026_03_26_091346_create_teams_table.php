@@ -12,10 +12,11 @@ return new class extends Migration {
             $table->string('name');
             $table->string('tag')->nullable();
             $table->string('logo')->nullable();
+            $table->foreignId('creator_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('captain_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('university_id')->constrained('universities')->cascadeOnDelete();
-            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->string('join_url')->unique()->nullable();
+            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             $table->timestamps();
         });
     }

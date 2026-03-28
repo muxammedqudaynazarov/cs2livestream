@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserClub extends Model
+class TournamentTeam extends Model
 {
     //
 }

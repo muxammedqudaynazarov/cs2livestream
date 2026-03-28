@@ -8,17 +8,18 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->unique()->primary();
             $table->string('name');
-            $table->string('real_name');
+            $table->string('real_name')->nullable();
             $table->unsignedInteger('hemis_id')->nullable();
             $table->text('profile_url');
-            $table->text('stream_avatar');
-            $table->text('user_photo');
+            $table->text('steam_avatar');
+            $table->text('user_photo')->nullable();
             $table->string('country')->default('UZ');
             $table->string('pos')->default('user');
             $table->json('rol')->default(json_encode(['user']));
-            $table->foreignId('group_id')->constrained('groups')->cascadeOnDelete();
+            $table->foreignId('group_id')->nullable()->constrained('groups')->cascadeOnDelete();
+            $table->rememberToken();
             $table->timestamps();
         });
 

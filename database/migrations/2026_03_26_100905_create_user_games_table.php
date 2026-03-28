@@ -7,17 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('user_teams', function (Blueprint $table) {
+        Schema::create('user_games', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('team_id')->constrained('teams')->cascadeOnDelete();
-            $table->enum('status', ['0', '1', '2', '3'])->default('0');
+            $table->foreignId('score_id')->constrained('scores')->cascadeOnDelete();
+            $table->integer('kills')->default(0);
+            $table->integer('deaths')->default(0);
+            $table->integer('assists')->default(0);
+            $table->integer('damages')->default(0);
+            $table->integer('mvps')->default(0);
+            $table->decimal('ratio')->default(0);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('user_teams');
+        Schema::dropIfExists('user_games');
     }
 };

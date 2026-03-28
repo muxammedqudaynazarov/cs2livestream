@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('tournament_id')->constrained('tournaments')->cascadeOnDelete();
             $table->foreignId('team_id')->constrained('teams')->cascadeOnDelete();
-            $table->enum('enum', ['0', '1', '2'])->default('0');
+            $table->enum('status', ['0', '1', '2'])->default('0');
             $table->timestamps();
         });
     }

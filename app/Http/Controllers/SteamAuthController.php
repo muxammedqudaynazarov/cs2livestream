@@ -17,23 +17,20 @@ class SteamAuthController extends Controller
     {
         try {
             $steamUser = Socialite::driver('steam')->user();
-            dd($steamUser);
-            $user = User::firstOrCreate(
-                ['steam_id' => $steamUser->getId()], // SteamID64
+            $user = User::updateOrCreate(
+                ['id' => $steamUser->getId()],
                 [
-                    'name' => $steamUser->getNickname(),   // O'yindagi niki
-                    'avatar' => $steamUser->getAvatar(),   // Profil rasmi
-                    'password' => bcrypt(str_random(16))   // Avtomatik parol
+                    'name' => $steamUser->getNickname(),
+                    'steam_avatar' => $steamUser->getAvatar(),
+                    'profile_url' => $steamUser->user['profileurl'] ?? null,
+                    'country' => $steamUser->user['loccountrycode'] ?? 'UZ',
                 ]
             );
-
-// Tizimga kiritamiz
             Auth::login($user, true);
-
-// Asosiy sahifaga yo'naltiramiz
-            return redirect('/dashboard');
-
+            request()->session()->regenerate();
+            return redirect()->route('home');
         } catch (\Exception $e) {
+            \Log::error('Steam Login xatosi: ' . $e->getMessage());
             return redirect('/login')->with('error', 'Steam avtorizatsiyasida xatolik yuz berdi!');
         }
     }

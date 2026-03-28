@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('invoice')->unique();
             $table->foreignId('tournament_id')->constrained('tournaments')->cascadeOnDelete();
             $table->foreignId('team_id')->constrained('teams')->cascadeOnDelete();
-            $table->enum('payment_status', ['pending', 'paid', 'cancelled', 'refunded'])->default('0');
+            $table->enum('payment_status', ['pending', 'paid', 'cancelled', 'refunded'])->default('pending');
             $table->decimal('amount', 15, 2);
             $table->string('payment_method')->nullable();
             $table->timestamps();
