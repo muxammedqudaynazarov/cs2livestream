@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Map;
 use App\Models\UserGame;
 use Illuminate\Http\Request;
 
@@ -19,6 +20,17 @@ class HomeController extends Controller
         $userKpi = [
             'games' => UserGame::where('user_id', auth()->id())->count(),
         ];
-        return view('home', compact(['userKpi']));
+        $maps = Map::all();
+        $mapRates = [];
+        foreach ($maps as $map) {
+            $mapRates[ucfirst($map->name)]['wins'] = UserGame::where('user_id', auth()->id())->where('map_id', $map->id)->where('win', '1')->count();
+            $mapRates[ucfirst($map->name)]['loss'] = UserGame::where('user_id', auth()->id())->where('map_id', $map->id)->where('win', '0')->count();
+        }
+        return view('home', compact(['userKpi', 'mapRates']));
+    }
+
+    public function pick()
+    {
+        return view('map_pick');
     }
 }

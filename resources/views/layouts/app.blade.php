@@ -17,6 +17,7 @@
             font-family: 'Inter', sans-serif;
         }
     </style>
+    @yield('style')
 </head>
 <body class="font-sans antialiased bg-slate-50 text-slate-800 flex flex-col min-h-screen">
 <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
@@ -121,6 +122,8 @@
 <main class="flex-grow">
     @yield('content')
 </main>
+
+@yield('script')
 
 <footer class="bg-white border-t border-slate-200 mt-auto">
     <div

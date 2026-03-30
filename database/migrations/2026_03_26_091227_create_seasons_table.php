@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('maps', function (Blueprint $table) {
+        Schema::create('seasons', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->default('Dust II');
-            $table->string('slug')->default('de_dust2');
+            $table->string('name');
+            $table->enum('actual', ['0', '1'])->default('1');
+            $table->enum('status', ['0', '1'])->default('1');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('maps');
+        Schema::dropIfExists('seasons');
     }
 };

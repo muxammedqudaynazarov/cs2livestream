@@ -12,6 +12,12 @@ return new class extends Migration {
             $table->foreignId('tournament_id')->constrained('tournaments')->cascadeOnDelete();
             $table->foreignId('team_id')->constrained('teams')->cascadeOnDelete();
             $table->enum('status', ['0', '1', '2'])->default('0');
+            $table->integer('kills')->default(0);
+            $table->integer('deaths')->default(0);
+            $table->integer('assists')->default(0);
+            $table->integer('mvps')->default(0);
+            $table->decimal('ratio')->default(0);
+            $table->json('ratio_array')->nullable();
             $table->timestamps();
         });
     }

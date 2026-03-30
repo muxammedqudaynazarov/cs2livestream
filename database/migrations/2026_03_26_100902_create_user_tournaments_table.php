@@ -15,9 +15,11 @@ return new class extends Migration {
             $table->integer('kills')->default(0);
             $table->integer('deaths')->default(0);
             $table->integer('assists')->default(0);
-            $table->integer('damages')->default(0);
             $table->integer('mvps')->default(0);
+            $table->integer('damages')->default(0);
             $table->decimal('ratio')->default(0);
+            $table->json('damages_array')->nullable();
+            $table->json('ratio_array')->nullable();
             $table->timestamps();
         });
     }
