@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@section('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+@endsection
 @section('content')
     <div class="min-h-screen bg-slate-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,10 +29,14 @@
                                     </span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-slate-500">Mámleket:</span>
-                                <span class="text-slate-800 font-medium flex items-center gap-2">
-                                {{ Auth::user()->country ?? 'UZ' }}
-                            </span>
+                                <div class="text-slate-500">Mámleket:</div>
+                                <div class="text-slate-800 font-medium flex items-center gap-2">
+                                    @php
+                                        $countryCode = strtolower(Auth::user()->country ?? 'uz');
+                                    @endphp
+                                    <span class="fi fi-{{ $countryCode }} rounded-sm shadow-sm"></span>
+                                    <span class="uppercase">{{ Auth::user()->country ?? 'UZ' }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -77,32 +83,107 @@
                             <i class="fa-solid fa-chart-line text-emerald-500"></i>
                             Meniń reytingim
                         </h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="block text-2xl font-black text-slate-900">
+                        @php
+                            $colCl = (isset($faceit) && $faceit->level) ? 'md:grid-cols-5' : 'md:grid-cols-4'
+                        @endphp
+                        <div class="grid grid-cols-2 sm:grid-cols-3 {!! $colCl !!} gap-4">
+                            <div
+                                class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center">
+                                <div class="block text-2xl font-black text-slate-900">
                                     {{ $userKpi['games'] ?? 0 }}
-                                </span>
+                                </div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">Oyınlar</span>
                             </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="block text-2xl font-black text-emerald-600">
+
+                            <div
+                                class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center">
+                                <div class="block text-2xl font-black text-emerald-600">
                                     {{ number_format(0, 2) }}
-                                </span>
+                                </div>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">K/D ratio</span>
                             </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="text-2xl font-black text-amber-400">0</span>
-                                <span class="text-2xl">/</span>
-                                <span class="text-2xl font-black text-amber-700">0</span>
+
+                            <div
+                                class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center">
+                                <div class="flex items-center justify-center gap-1">
+                                    <span class="text-2xl font-black text-amber-500">0</span>
+                                    <span class="text-xl text-slate-300">/</span>
+                                    <span class="text-2xl font-black text-rose-500">0</span>
+                                </div>
                                 <span
-                                    class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">
-                                    Ulıwma (Kill / Dead)
-                                </span>
+                                    class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">Kills / Deaths</span>
                             </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
+
+                            <div
+                                class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center">
                                 <span class="block text-2xl font-black text-blue-600">0%</span>
                                 <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">Win Rate</span>
                             </div>
+
+                            @if(isset($faceit) && $faceit->level)
+                                @php
+                                    // To'lish foizlari (percent) stroke-linecap="round" qo'shadigan
+                                    // ortiqcha uzunlikni hisobga olib biroz kamaytirildi.
+                                    $faceitStyles = [
+                                        1  => ['color' => '#FFFFFF', 'percent' => 4],
+                                        2  => ['color' => '#1CE500', 'percent' => 12],
+                                        3  => ['color' => '#1CE500', 'percent' => 20],
+                                        4  => ['color' => '#FFC600', 'percent' => 28],
+                                        5  => ['color' => '#FFC600', 'percent' => 36],
+                                        6  => ['color' => '#FFC600', 'percent' => 44],
+                                        7  => ['color' => '#FFC600', 'percent' => 52],
+                                        8  => ['color' => '#FF8500', 'percent' => 60],
+                                        9  => ['color' => '#FF8500', 'percent' => 68],
+                                        10 => ['color' => '#FE0000', 'percent' => 76],
+                                    ];
+                                    $levelStyle = $faceitStyles[$faceit->level] ?? $faceitStyles[1];
+
+                                    $radius = 16;
+                                    $circumference = 2 * 3.14159 * $radius;
+                                    $dashoffset = $circumference - ($levelStyle['percent'] / 100) * $circumference;
+                                @endphp
+
+                                <div
+                                    class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center relative overflow-hidden group">
+                                    <i class="fa-brands fa-faceit absolute -right-4 -bottom-4 text-6xl text-[#FF5500]/10 group-hover:scale-110 transition-transform"></i>
+
+                                    <div class="relative z-10 flex flex-col items-center justify-center w-full h-full">
+                                        <div class="flex items-center justify-center gap-4">
+
+                                            <div
+                                                class="relative w-12 h-12 flex items-center justify-center bg-[#1f1f1f] rounded-full shadow-md shrink-0">
+
+                                                <svg class="absolute inset-0 w-full h-full transform rotate-[135deg]"
+                                                     viewBox="0 0 40 40">
+                                                    <circle cx="20" cy="20" r="{{ $radius }}" fill="none"
+                                                            stroke="#333333" stroke-width="4"></circle>
+
+                                                    <circle cx="20" cy="20" r="{{ $radius }}" fill="none"
+                                                            stroke="{{ $levelStyle['color'] }}" stroke-width="4"
+                                                            stroke-dasharray="{{ $circumference }}"
+                                                            stroke-dashoffset="{{ $dashoffset }}"
+                                                            stroke-linecap="round"></circle>
+                                                </svg>
+
+                                                <div class="relative z-10 font-black text-lg"
+                                                     style="color: {{ $levelStyle['color'] }};">
+                                                    {{ $faceit->level }}
+                                                </div>
+                                            </div>
+
+                                            <div class="text-left flex flex-col justify-center" style="line-height: 3px">
+                                                <div class="block text-2xl font-black text-slate-900 leading-none">
+                                                    {{ $faceit->elo }}
+                                                </div>
+                                                <div class="text-[10px] font-bold text-[#FF5500] uppercase block mt-1">
+                                                    FaceIT
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -118,27 +199,6 @@
                         <div class="p-6 flex justify-center">
                             <div class="relative w-full max-w-2xl" style="height: 400px;">
                                 <canvas id="mapStatsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
-                                Turnir ushın tólemler
-                            </h3>
-                        </div>
-                        <div class="p-6 text-center text-slate-500">
-                            <div class="py-6">
-                                <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-sm">Házirgi waqıtta sizge tiyisli bolǵan invoyslar tabılmadı.</p>
-                                <p class="text-xs mt-1 text-slate-400">
-                                    Turnir túrine qarap (pullı yamasa pulsız) komandańızdı turnirden dizimnen
-                                    ótkerseńiz, invoyslar avtomatikalıq túrde payda boladı.
-                                </p>
                             </div>
                         </div>
                     </div>

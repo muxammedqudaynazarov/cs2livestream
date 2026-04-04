@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->foreignId('pick_id')->nullable()->constrained('teams')->cascadeOnDelete();
             $table->integer('team_1_score')->default(0);
             $table->integer('team_2_score')->default(0);
+            $table->enum('win', ['t1', 't2'])->default('t1');
             $table->foreignId('winner_team_id')->nullable()->constrained('teams')->cascadeOnDelete();
             $table->timestamps();
         });

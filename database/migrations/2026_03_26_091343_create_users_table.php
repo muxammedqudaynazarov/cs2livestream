@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('country')->default('UZ');
             $table->string('pos')->default('user');
             $table->json('rol')->default(json_encode(['user']));
+            $table->json('faceit')->nullable();
             $table->foreignId('group_id')->nullable()->constrained('groups')->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();

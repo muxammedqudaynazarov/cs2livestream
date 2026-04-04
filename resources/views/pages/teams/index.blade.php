@@ -1,263 +1,124 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-slate-50 py-8">
+    <div class="min-h-screen bg-slate-50 py-8 font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-1 space-y-6">
-                    <div
-                        class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col items-center text-center">
-                        <div class="relative mb-4">
-                            <img src="{{ Auth::user()->steam_avatar ?? '/images/avatar.jpg' }}" alt="Avatar"
-                                 class="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-md">
-                            <div
-                                class="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full"
-                                title="Online"></div>
-                        </div>
-                        <h2 class="text-xl font-bold text-slate-900">{{ Auth::user()->name }}</h2>
-                        <p class="text-sm font-medium text-blue-600 uppercase tracking-widest mt-1">
-                            {{ Auth::user()->pos ?? 'oyınshı' }}
-                        </p>
-                        <div class="w-full mt-6 pt-6 border-t border-slate-100 flex flex-col gap-3 text-sm">
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-500">Steam ID:</span>
-                                <span class="font-mono text-slate-800 font-medium">
-                                    {{ Auth::user()->id ?? 'anıqlanbaǵan' }}
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 uppercase tracking-tight">Komandalar reytingi</h1>
+                    <p class="text-sm text-slate-500 mt-1">
+                        Sistemada dizimge alınǵan hámme komandalar hám olardıń statistikaları.
+                    </p>
+                </div>
+
+                <a href="{{ route('teams.create') }}"
+                   class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all active:scale-95 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                    <span>Komanda qosıw</span>
+                </a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+
+                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-crosshairs text-blue-500"></i>
+                        Komandalar
+                    </h3>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead
+                            class="bg-slate-50/50 border-b border-slate-200 text-xs uppercase font-black text-slate-500 tracking-widest">
+                        <tr>
+                            <th scope="col" style="width: 7%" class="px-6 py-4 text-center">#</th>
+                            <th scope="col" class="px-6 py-4">Jamoa (Team)</th>
+                            <th scope="col" style="width: 7%" class="px-6 py-4 text-center">O</th>
+                            <th scope="col" style="width: 7%" class="px-6 py-4 text-center">U</th>
+                            <th scope="col" style="width: 7%" class="px-6 py-4 text-center">J</th>
+                            <th scope="col" style="width: 7%" class="px-6 py-4 text-center">%</th>
+                            <th scope="col" style="width: 12%" class="px-6 py-4 text-center">K / D</th>
+                            <th scope="col" style="width: 12%" class="px-6 py-4 text-center text-blue-600">Rating</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                        @forelse($teams as $team)
+                            <tr class="hover:bg-slate-50/80 transition-colors group">
+
+                                <td class="px-6 py-4 text-center font-bold text-slate-400">
+                                    {{ ($teams->currentPage() - 1) * $teams->perPage() + $loop->iteration }}
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-4">
+                                        <div
+                                            class="relative w-10 h-10 rounded-full bg-slate-100 border-2 border-slate-200 overflow-hidden flex-shrink-0 group-hover:border-blue-400 transition-colors">
+                                            @if($team->team->logo)
+                                                <img src="{{ $team->team->logo }}" alt="{{ $team->team->name }}"
+                                                     class="w-full h-full object-cover">
+                                            @else
+                                                <i class="fa-solid fa-shield text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+                                            @endif
+                                        </div>
+                                        <span
+                                            class="font-black text-slate-900 text-base uppercase tracking-tight">{{ $team->team->name }}</span>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 text-center font-bold text-slate-600">
+                                    {{ $team->team->all_games->count() }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    {{ $team->team->wins_count }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    {{ $team->team->losses_count }}
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    {{ number_format(($team->team->wins_count / ($team->team->all_games->count() == 0 ? 1 : $team->team->all_games->count()) * 100), 2) }}%
+                                </td>
+
+                                <td class="px-6 py-4 text-center font-semibold text-slate-600">
+                                    <span class="text-slate-900">{{ $team->kills }}</span>
+                                    <span class="text-slate-300 mx-1">/</span>
+                                    <span class="text-slate-500">{{ $team->deaths }}</span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-black {{ $team->ratio >= 1.0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600' }}">
+                                        {{ number_format($team->ratio, 2) }}
                                     </span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-slate-500">Mámleket:</span>
-                                <span class="text-slate-800 font-medium flex items-center gap-2">
-                                {{ Auth::user()->country ?? 'UZ' }}
-                            </span>
-                            </div>
-                        </div>
-                    </div>
+                                </td>
 
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved text-blue-500"></i> Meniń komandam
-                        </h3>
-                        @if(false)
-                            <div class="flex items-center gap-4">
-                                <img src="/images/team-logo.png" alt="Team Logo"
-                                     class="w-12 h-12 rounded bg-slate-100 border border-slate-200">
-                                <div>
-                                    <h4 class="font-bold text-slate-900">TUIT Dragons</h4>
-                                    <p class="text-xs text-slate-500">Sardor: Siz</p>
-                                </div>
-                            </div>
-                            <a href="#"
-                               class="mt-4 w-full block text-center py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-semibold rounded transition-colors border border-slate-200">
-                                Komandanı basqarıw
-                            </a>
-                        @else
-                            <div class="text-center py-4">
-                                <div
-                                    class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3 text-slate-400">
-                                    <i class="fa-solid fa-users-slash text-xl"></i>
-                                </div>
-                                <p class="text-sm text-slate-500 mb-4">
-                                    Siz házirge shekem hesh bir komandaǵa aǵza bolmaǵansız yamasa komanda dúzbegensiz.
-                                </p>
-                                <a href="{{ route('teams.index') }}"
-                                   class="inline-block w-full text-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition-colors shadow-sm">
-                                    Komandalar
-                                </a>
-                            </div>
-                        @endif
-                    </div>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <div
+                                        class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-4">
+                                        <i class="fa-solid fa-users-slash text-3xl"></i>
+                                    </div>
+                                    <p class="text-sm text-slate-500 mt-1">
+                                        Hesh qanday maǵlıwmat tabılmadı
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
                 </div>
-
-                <div class="lg:col-span-2 space-y-6">
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-emerald-500"></i>
-                            Meniń reytingim
-                        </h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="block text-2xl font-black text-slate-900">
-                                    {{ $userKpi['games'] ?? 0 }}
-                                </span>
-                                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">Oyınlar</span>
-                            </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="block text-2xl font-black text-emerald-600">
-                                    {{ number_format(0, 2) }}
-                                </span>
-                                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">K/D ratio</span>
-                            </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="text-2xl font-black text-amber-400">0</span>
-                                <span class="text-2xl">/</span>
-                                <span class="text-2xl font-black text-amber-700">0</span>
-                                <span
-                                    class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">
-                                    Ulıwma (Kill / Dead)
-                                </span>
-                            </div>
-                            <div class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center">
-                                <span class="block text-2xl font-black text-blue-600">0%</span>
-                                <span class="text-[10px] font-bold text-slate-500 uppercase mt-1 block">Win Rate</span>
-                            </div>
-                        </div>
+                @if($teams->hasPages())
+                    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50">
+                        {{ $teams->links() }}
                     </div>
-
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-                        <div
-                            class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-crosshairs text-blue-500"></i>
-                                Oyınlar statistikası
-                            </h3>
-                        </div>
-                        <div class="p-6 flex justify-center">
-                            <div class="relative w-full max-w-2xl" style="height: 400px;">
-                                <canvas id="mapStatsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
-                                Turnir ushın tólemler
-                            </h3>
-                        </div>
-                        <div class="p-6 text-center text-slate-500">
-                            <div class="py-6">
-                                <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-sm">Házirgi waqıtta sizge tiyisli bolǵan invoyslar tabılmadı.</p>
-                                <p class="text-xs mt-1 text-slate-400">
-                                    Turnir túrine qarap (pullı yamasa pulsız) komandańızdı turnirden dizimnen
-                                    ótkerseńiz, invoyslar avtomatikalıq túrde payda boladı.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
-                                Turnir ushın tólemler
-                            </h3>
-                        </div>
-                        <div class="p-6 text-center text-slate-500">
-                            <div class="py-6">
-                                <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-sm">Házirgi waqıtta sizge tiyisli bolǵan invoyslar tabılmadı.</p>
-                                <p class="text-xs mt-1 text-slate-400">
-                                    Turnir túrine qarap (pullı yamasa pulsız) komandańızdı turnirden dizimnen
-                                    ótkerseńiz, invoyslar avtomatikalıq túrde payda boladı.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+                @endif
             </div>
         </div>
     </div>
-@endsection
-@section('script')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('mapStatsChart').getContext('2d');
-            const mapRates = @json($mapRates);
-            const mapLabels = Object.keys(mapRates);
-            const winData = [];
-            const lossData = [];
-            mapLabels.forEach(mapName => {
-                winData.push(mapRates[mapName].wins);
-                lossData.push(mapRates[mapName].loss);
-            });
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: mapLabels,
-                    datasets: [
-                        {
-                            label: 'Wins',
-                            data: winData,
-                            backgroundColor: 'rgba(16, 185, 129, 0.4)',
-                            borderColor: 'rgb(16, 185, 129)',
-                            borderWidth: 1,
-                            pointBackgroundColor: 'rgb(16, 185, 129)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(16, 185, 129)',
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        },
-                        {
-                            label: 'Loss',
-                            data: lossData,
-                            backgroundColor: 'rgba(244, 63, 94, 0.4)',
-                            borderColor: 'rgb(244, 63, 94)',
-                            borderWidth: 1,
-                            pointBackgroundColor: 'rgb(244, 63, 94)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(244, 63, 94)',
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    elements: {
-                        line: {
-                            tension: 0
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleFont: {size: 14, family: "'Inter', sans-serif"},
-                            bodyFont: {size: 13, family: "'Inter', sans-serif"},
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: true
-                        }
-                    },
-                    scales: {
-                        r: {
-                            angleLines: {
-                                color: 'rgba(148, 163, 184, 0.15)'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.15)',
-                                circular: false
-                            },
-                            pointLabels: {
-                                font: {family: "'Inter', sans-serif", weight: 'bold', size: 12},
-                                color: '#1e293b'
-                            },
-                            ticks: {
-                                display: false,
-                                stepSize: 1,
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 @endsection

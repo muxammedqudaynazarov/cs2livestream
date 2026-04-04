@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Map;
+use App\Models\Season;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -25,5 +26,9 @@ class MapSeeder extends Seeder
                 'slug' => $slug,
             ]);
         }
+
+        Season::create([
+            'name' => 'Rate2026',
+        ]);
     }
 }

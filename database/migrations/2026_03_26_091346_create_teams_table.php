@@ -9,14 +9,14 @@ return new class extends Migration {
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('tag')->nullable();
+            $table->string('name')->unique();
+            $table->string('tag')->unique();
             $table->string('logo')->nullable();
             $table->foreignId('creator_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('captain_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('university_id')->constrained('universities')->cascadeOnDelete();
             $table->string('join_url')->unique()->nullable();
-            $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'banned'])->default('inactive');
             $table->timestamps();
         });
     }
