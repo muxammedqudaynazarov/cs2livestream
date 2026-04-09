@@ -8,4 +8,4 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/livestream/gsi', [CsDatumController::class, 'livestream']);
+//Route::post('/livestream/gsi', [CsDatumController::class, 'livestream']);

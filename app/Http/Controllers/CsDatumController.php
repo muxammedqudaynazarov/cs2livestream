@@ -11,7 +11,7 @@ class CsDatumController extends Controller
     public function livestream(Request $request)
     {
         CsDatum::create([
-            'data' => json_encode($request->data),
+            'data' => json_encode($request->all()),
         ]);
         return response()->json([
             'status' => 'OK',
