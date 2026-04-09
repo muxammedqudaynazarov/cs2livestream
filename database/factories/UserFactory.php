@@ -2,44 +2,32 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-/**
- * @extends Factory<User>
- */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $steamId = $this->faker->unique()->numerify('7656119########');
+        $username = $this->faker->unique()->userName();
+        $avatarUrl = 'https://api.dicebear.com/8.x/adventurer/svg?seed=' . urlencode($username);
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'id' => $steamId,
+            'name' => $username,
+            'real_name' => $this->faker->name(),
+            'profile_url' => 'https://steamcommunity.com/profiles/' . $steamId,
+            'steam_avatar' => $avatarUrl,
+            'user_photo' => $avatarUrl,
+            'country' => $this->faker->randomElement(['UZ', 'KZ', 'KG', 'RU']),
+            'pos' => $this->faker->randomElement(['user', 'admin', 'moderator']),
+            'faceit' => json_encode([
+                'level' => $this->faker->numberBetween(1, 10),
+                'elo' => $this->faker->numberBetween(500, 3500)
+            ]),
+            'elo' => $this->faker->numberBetween(500, 3000),
+            'priority' => $this->faker->randomElement(['1', '0']),
             'remember_token' => Str::random(10),
         ];
-    }
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
     }
 }

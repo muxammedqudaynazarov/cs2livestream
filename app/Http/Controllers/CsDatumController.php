@@ -8,6 +8,22 @@ use Illuminate\Support\Facades\Response;
 
 class CsDatumController extends Controller
 {
+    public function score_live()
+    {
+        return view('score_live');
+    }
+
+    public function setka()
+    {
+        return view('setka');
+    }
+
+    public function get($id)
+    {
+        $datum = CsDatum::findOrFail($id);
+        dd(json_decode($datum->data));
+    }
+
     public function livestream(Request $request)
     {
         CsDatum::create([
