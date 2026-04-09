@@ -108,13 +108,21 @@
                 </a>
 
                 <div class="hidden md:flex items-center space-x-1">
-                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 bg-blue-50">Bas meyu</a>
-                    <a href="#"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Turnirler</a>
-                    <a href="#"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Komandalar</a>
-                    <a href="#"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-slate-50 transition-colors">Reyting</a>
+                    <a href="{{ route('home') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600  @if(request()->is('home')) bg-blue-50 @endif">
+                        Bas meyu
+                    </a>
+                    <a href="{{ route('matchmaking.index') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">
+                        Matchmaking
+                    </a>
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">
+                        Turnirler
+                    </a>
+                    <a href="{{ route('teams.index') }}"
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 @if(request()->is('teams*')) bg-blue-50 @endif">
+                        Komandalar
+                    </a>
                 </div>
             </div>
 
@@ -160,10 +168,6 @@
                                 <a href="/home"
                                    class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
                                     <span>Kabinet</span>
-                                </a>
-                                <a href="/team"
-                                   class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                                    <span>Komandam</span>
                                 </a>
                                 <a href="/invoices"
                                    class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">

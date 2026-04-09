@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
+use App\Models\Map;
 use App\Models\Option;
+use App\Models\Score;
 use App\Models\Season;
 use App\Models\SeasonTeam;
 use App\Models\Team;
@@ -11,6 +14,7 @@ use App\Models\UserTeam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use function Symfony\Component\Translation\t;
 
 class TeamController extends Controller
 {
@@ -168,9 +172,22 @@ class TeamController extends Controller
 
     public function show(Team $team)
     {
-        $transfer = Option::where('key', 'transfer')->first();
-        $transfer = $transfer->value;
-        return view('pages.teams.show', compact(['team', 'transfer']));
-    }
+        $transfer = Option::where('key', 'transfer')->value('value');
+        $maps = Map::all();
+        $labels = [];
+        $winsData = [];
+        $lossesData = [];
 
+        foreach ($maps as $map) {
+            $labels[] = ucfirst($map->name);
+            $wins = Score::where('map_id', $map->id)->where('winner_team_id', $team->id)->count();
+            $losses = Score::where('map_id', $map->id)->whereHas('game', function ($q) use ($team) {
+                $q->where('team_1_id', $team->id)->orWhere('team_2_id', $team->id);
+            })->whereNotNull('winner_team_id')->where('winner_team_id', '!=', $team->id)->count();
+            $winsData[] = $wins;
+            $lossesData[] = $losses;
+        }
+        //dd($team, $transfer, $labels, $winsData, $lossesData);
+        return view('pages.teams.show', compact(['team', 'transfer', 'labels', 'winsData', 'lossesData']));
+    }
 }

@@ -62,8 +62,10 @@
                                                 <i class="fa-solid fa-shield text-slate-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
                                             @endif
                                         </div>
-                                        <span
-                                            class="font-black text-slate-900 text-base uppercase tracking-tight">{{ $team->team->name }}</span>
+                                        <a href="{{ route('teams.show', $team->team_id) }}"
+                                           class="font-black text-slate-900 text-base uppercase tracking-tight">
+                                            {{ $team->team->name }}
+                                        </a>
                                     </div>
                                 </td>
 

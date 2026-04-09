@@ -2,61 +2,84 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Game;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
-    private $map_pool = [
-        'de_mirage', 'de_inferno', 'de_nuke', 'de_ancient',
-        'de_anubis', 'de_dust2', 'de_overpass'
-    ];
-
-    private $sequence = [
-        ['team' => 'Team 1', 'action' => 'ban'],
-        ['team' => 'Team 2', 'action' => 'ban'],
-        ['team' => 'Team 1', 'action' => 'ban'],
-        ['team' => 'Team 2', 'action' => 'ban'],
-        ['team' => 'Team 1', 'action' => 'pick'],
-        ['team' => 'Team 2', 'action' => 'pick'],
-    ];
-
-    public function index($id)
+    // O'yin formatiga qarab ketma-ketlikni belgilaymiz
+    private function getSequence($format)
     {
-        $sessionKey = 'veto_match_' . $id;
-        if (!session()->has($sessionKey)) {
-            session([
-                $sessionKey => [
-                    'step' => 0,
-                    'available_maps' => $this->map_pool,
-                    'history' => [],
-                    'is_finished' => false
-                ]
-            ]);
+        if ($format === 'BO3') {
+            return [
+                ['team' => 'team1', 'action' => 'ban'],
+                ['team' => 'team2', 'action' => 'ban'],
+                ['team' => 'team1', 'action' => 'pick'],
+                ['team' => 'team2', 'action' => 'pick'],
+                ['team' => 'team1', 'action' => 'ban'],
+                ['team' => 'team2', 'action' => 'ban'],
+            ];
+        } elseif ($format === 'BO5') {
+            return [
+                ['team' => 'team1', 'action' => 'ban'],
+                ['team' => 'team2', 'action' => 'ban'],
+                ['team' => 'team1', 'action' => 'pick'],
+                ['team' => 'team2', 'action' => 'pick'],
+                ['team' => 'team1', 'action' => 'pick'],
+                ['team' => 'team2', 'action' => 'pick'],
+            ];
         }
-        $vetoState = session($sessionKey);
-        $currentTurn = $vetoState['is_finished'] ? null : $this->sequence[$vetoState['step']];
-        return view('map_pick', compact(['id', 'vetoState', 'currentTurn']));
+
+        // Default (BO1)
+        return [
+            ['team' => 'team1', 'action' => 'ban'],
+            ['team' => 'team2', 'action' => 'ban'],
+            ['team' => 'team1', 'action' => 'ban'],
+            ['team' => 'team2', 'action' => 'ban'],
+            ['team' => 'team1', 'action' => 'ban'],
+            ['team' => 'team2', 'action' => 'ban'],
+        ];
     }
 
     public function action(Request $request, $id)
     {
-        $sessionKey = 'veto_match_' . $id;
-        $state = session($sessionKey);
-        $map = $request->input('map');
-        if ($state['is_finished'] || !in_array($map, $state['available_maps'])) {
-            return response()->json(['error' => 'Invalid move'], 400);
-        }
-        $step = $state['step'];
-        $currentTurn = $this->sequence[$step];
+        $game = Game::findOrFail($id);
+        $cacheKey = 'veto_match_' . $id;
+        $state = Cache::get($cacheKey);
 
+        $map = $request->input('map');
+        $sequence = $this->getSequence($game->format);
+
+        if (!$state || $state['is_finished'] || !in_array($map, $state['available_maps'])) {
+            return response()->json(['error' => 'Noto\'g\'ri harakat'], 400);
+        }
+
+        $step = $state['step'];
+        $currentTurn = $sequence[$step];
+
+        // XAVFSIZLIK: Faqat o'z navbati kelgan jamoa sardori bosa oladi
+        $user = auth()->user();
+        $isMyTurn = false;
+
+        if ($currentTurn['team'] == 'team1' && $user->id == $game->team1->captain_id) $isMyTurn = true;
+        if ($currentTurn['team'] == 'team2' && $user->id == $game->team2->captain_id) $isMyTurn = true;
+
+        if (!$isMyTurn) {
+            return response()->json(['error' => 'Hozir sizning navbatingiz emas!'], 403);
+        }
+
+        // Harakatni qayd etamiz
         $state['history'][$map] = [
             'action' => $currentTurn['action'],
-            'team' => $currentTurn['team']
+            'team' => $currentTurn['team'] == 'team1' ? $game->team1->name : $game->team2->name
         ];
+
         $state['available_maps'] = array_values(array_diff($state['available_maps'], [$map]));
         $state['step']++;
 
-        if ($state['step'] == 6) {
+        // Avtomatik decider xaritasi (Oxirgi bosqich)
+        if ($state['step'] == count($sequence)) {
             $deciderMap = $state['available_maps'][0];
             $state['history'][$deciderMap] = [
                 'action' => 'decider',
@@ -64,51 +87,45 @@ class MapController extends Controller
             ];
             $state['available_maps'] = [];
             $state['is_finished'] = true;
+
+            // O'yin statusini live ga o'tkazib yuboramiz
+            $game->update(['status' => 'live']);
         }
 
-        session([$sessionKey => $state]);
-        $nextTurn = $state['is_finished'] ? null : $this->sequence[$state['step']];
-        return response()->json([
-            'status' => 'success',
-            'map' => $map,
-            'action' => $currentTurn['action'],
-            'team' => $currentTurn['team'],
-            'is_finished' => $state['is_finished'],
-            'history' => $state['history'],
-            'next_turn' => $nextTurn
-        ]);
-    }
+        Cache::put($cacheKey, $state);
 
-    // MapController.php ichiga qo'shiladigan yangi metod:
+        return response()->json(['status' => 'success']);
+    }
 
     public function autoAction($id)
     {
-        $sessionKey = 'veto_match_' . $id;
-        $state = session($sessionKey);
+        $game = Game::findOrFail($id);
+        $cacheKey = 'veto_match_' . $id;
+        $state = Cache::get($cacheKey);
+        $sequence = $this->getSequence($game->format);
 
-        // Agar sessiya bo'lmasa yoki o'yin allaqachon tugagan bo'lsa, xato qaytaramiz
         if (!$state || $state['is_finished']) {
-            return response()->json(['error' => 'Invalid state'], 400);
+            return response()->json(['error' => 'Noto\'g\'ri holat'], 400);
         }
 
         $step = $state['step'];
-        $currentTurn = $this->sequence[$step];
+        $currentTurn = $sequence[$step];
 
-        // Mavjud (hali tanlanmagan) xaritalar ichidan tasodifiy bittasini tanlaymiz
+        // Tasodifiy xarita
         $randomMapKey = array_rand($state['available_maps']);
         $map = $state['available_maps'][$randomMapKey];
 
-        // 1. Tanlangan mapni history'ga qo'shamiz
+        $teamName = $currentTurn['team'] == 'team1' ? $game->team1->name : $game->team2->name;
+
         $state['history'][$map] = [
             'action' => $currentTurn['action'],
-            'team' => $currentTurn['team'] . ' (Auto)' // Avtomat qilinganini bildirish uchun
+            'team' => $teamName . ' (Auto)'
         ];
 
         $state['available_maps'] = array_values(array_diff($state['available_maps'], [$map]));
         $state['step']++;
 
-        // 2. Decider mantiqi (agar oxirgi qadam bo'lsa)
-        if ($state['step'] == 6) {
+        if ($state['step'] == count($sequence)) {
             $deciderMap = $state['available_maps'][0];
             $state['history'][$deciderMap] = [
                 'action' => 'decider',
@@ -117,22 +134,11 @@ class MapController extends Controller
             $state['available_maps'] = [];
             $state['is_finished'] = true;
 
-            // SHU YERDA: Veto tugadi, bazaga yozish mumkin.
+            $game->update(['status' => 'live']);
         }
 
-        // Sessiyani yangilash
-        session([$sessionKey => $state]);
+        Cache::put($cacheKey, $state);
 
-        $nextTurn = $state['is_finished'] ? null : $this->sequence[$state['step']];
-
-        return response()->json([
-            'status' => 'success',
-            'map' => $map,
-            'action' => $currentTurn['action'],
-            'team' => $currentTurn['team'],
-            'is_finished' => $state['is_finished'],
-            'history' => $state['history'],
-            'next_turn' => $nextTurn
-        ]);
+        return response()->json(['status' => 'success']);
     }
 }

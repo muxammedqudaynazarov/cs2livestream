@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name')->default('Dust II');
             $table->string('slug')->default('de_dust2');
+            $table->enum('status', ['0', '1'])->default('1');
             $table->timestamps();
         });
     }

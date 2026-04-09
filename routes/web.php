@@ -4,6 +4,7 @@ use App\Http\Controllers\CsDatumController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MapController;
+use App\Http\Controllers\MatchmakingController;
 use App\Http\Controllers\SteamAuthController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserTeamController;
@@ -27,6 +28,7 @@ Route::get('/login', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::resource('teams', TeamController::class);
+Route::resource('matchmaking', MatchmakingController::class);
 Route::patch('/teams/{team}/regenerate-url', [TeamController::class, 'regenerateUrl'])->name('teams.regenerate_join_url');
 Route::get('/join/{token}', [TeamController::class, 'joinTeam'])->name('teams.join')->middleware('auth');
 Route::post('/join/{token}', [TeamController::class, 'joinTeamPost'])->name('teams.join.post')->middleware('auth');
@@ -39,6 +41,8 @@ Route::prefix('teams/{team}')->name('team.')->group(function () {
     Route::post('/players/{player}/transfer', [UserTeamController::class, 'transferPlayer'])->name('transfer_player');
 });
 
-Route::get('/match/{id}/veto', [MapController::class, 'index']);
+Route::get('/match/{id}/veto', [MatchmakingController::class, 'show']);
+Route::post('/match/{id}/accept', [MatchmakingController::class, 'accept']); // YANGI
 Route::post('/match/{id}/veto/action', [MapController::class, 'action']);
 Route::post('/match/{id}/veto/auto', [MapController::class, 'autoAction']);
+Route::get('/api/match/{id}/status', [MatchmakingController::class, 'statusApi']); // YANGI (real-time tekshirish uchun)
