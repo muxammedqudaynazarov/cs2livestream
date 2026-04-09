@@ -16,6 +16,7 @@
         "laravel/socialite": "*",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "*",
+        "pusher/pusher-php-server": "*",
         "socialiteproviders/steam": "*",
         "spatie/laravel-permission": "*"
     },
