@@ -12,9 +12,10 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->string('tag')->unique();
             $table->string('logo')->nullable();
+            $table->unsignedBigInteger('cristal')->default(1000);
             $table->foreignId('creator_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('captain_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('university_id')->constrained('universities')->cascadeOnDelete();
+            $table->foreignId('form_id')->constrained('universities')->cascadeOnDelete();
             $table->string('join_url')->unique()->nullable();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('inactive');
             $table->timestamps();

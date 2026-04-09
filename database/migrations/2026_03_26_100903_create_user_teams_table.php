@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('team_id')->constrained('teams')->cascadeOnDelete();
             $table->enum('status', ['0', '1', '2', '3'])->default('0');
+            $table->enum('main', ['0', '1'])->default('1');
             $table->integer('kills')->default(0);
             $table->integer('deaths')->default(0);
             $table->integer('assists')->default(0);

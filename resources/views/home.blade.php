@@ -45,33 +45,69 @@
                         <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-shield-halved text-blue-500"></i> Meniń komandam
                         </h3>
-                        @if(false)
+                        @forelse($myTeams as $myTeam)
                             <div class="flex items-center gap-4">
-                                <img src="/images/team-logo.png" alt="Team Logo"
-                                     class="w-12 h-12 rounded bg-slate-100 border border-slate-200">
-                                <div>
-                                    <h4 class="font-bold text-slate-900">TUIT Dragons</h4>
-                                    <p class="text-xs text-slate-500">Sardor: Siz</p>
+                                <img src="{{ url($myTeam->team->logo) }}" alt="Team Logo"
+                                     class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 object-cover shrink-0">
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-slate-900 truncate">
+                                        {{ $myTeam->team->name }} [<a
+                                            href="{{ route('player', $myTeam->team->captain_id) }}"
+                                            class="text-blue-500 hover:underline transition-all">{{ $myTeam->team->captain->name }}</a>]
+                                    </h4>
+                                    @if(auth()->id() == $myTeam->team->creator_id)
+                                        <p class="text-xs text-slate-500 mt-0.5">
+                                            Oyınshılar: {{ $myTeam->team->players->count() }}
+                                        </p>
+                                    @else
+                                        <p class="text-xs text-slate-500 mt-0.5">
+                                            @if($myTeam->status == '1')
+                                                @if($myTeam->main == '1')
+                                                    Tiykarǵı quramda
+                                                @else
+                                                    Rezervte
+                                                @endif
+                                            @elseif($myTeam->status == '0')
+                                                Tastıyıqlaw kútilip atır
+                                            @elseif($myTeam->status == '2')
+                                                Transferge shıǵarılǵan
+                                            @elseif($myTeam->status == '3')
+                                                Komandadan ketken
+                                            @endif
+                                        </p>
+                                    @endif
                                 </div>
+                                @if ($myTeam->team->creator_id == auth()->id())
+                                    <a href="{{ route('teams.edit', $myTeam->team->id) }}"
+                                       class=" w-9 h-9 flex items-center justify-center bg-slate-50 hover:bg-slate-200
+                                   text-slate-600 hover:text-blue-600 text-sm rounded-lg transition-colors border
+                                   border-slate-200 shrink-0">
+                                        <i class="fa fa-pen"></i>
+                                    </a>
+                                @endif
+                                <a href="{{ route('teams.show', $myTeam->team->id) }}"
+                                   class=" w-9 h-9 flex items-center justify-center bg-slate-50 hover:bg-slate-200
+                                   text-slate-600 hover:text-blue-600 text-sm rounded-lg transition-colors border
+                                   border-slate-200 shrink-0">
+                                    <i class="fa fa-users"></i>
+                                </a>
                             </div>
-                            <a href="#"
-                               class="mt-4 w-full block text-center py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-semibold rounded transition-colors border border-slate-200">
-                                Komandanı basqarıw
-                            </a>
-                        @else
-                            <div class="text-center py-4">
+                        @empty
+                            <div class="text-center">
                                 <div
                                     class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-3 text-slate-400">
                                     <i class="fa-solid fa-users-slash text-xl"></i>
                                 </div>
-                                <p class="text-sm text-slate-500 mb-4">
+                                <p class="text-slate-400" style="font-size: 12px">
                                     Siz házirge shekem hesh bir komandaǵa aǵza bolmaǵansız yamasa komanda dúzbegensiz.
                                 </p>
-                                <a href="{{ route('teams.index') }}"
-                                   class="inline-block w-full text-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition-colors shadow-sm">
-                                    Komandalar
-                                </a>
                             </div>
+                        @endforelse
+                        @if(auth()->user()->priority == '1')
+                            <a href="{{ route('teams.create') }}"
+                               class="mt-4 inline-block w-full text-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg transition-colors shadow-sm">
+                                Komanda dúziw
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -121,73 +157,23 @@
                             </div>
 
                             @if(isset($faceit) && $faceit->level)
-                                @php
-                                    // To'lish foizlari (percent) stroke-linecap="round" qo'shadigan
-                                    // ortiqcha uzunlikni hisobga olib biroz kamaytirildi.
-                                    $faceitStyles = [
-                                        1  => ['color' => '#FFFFFF', 'percent' => 4],
-                                        2  => ['color' => '#1CE500', 'percent' => 12],
-                                        3  => ['color' => '#1CE500', 'percent' => 20],
-                                        4  => ['color' => '#FFC600', 'percent' => 28],
-                                        5  => ['color' => '#FFC600', 'percent' => 36],
-                                        6  => ['color' => '#FFC600', 'percent' => 44],
-                                        7  => ['color' => '#FFC600', 'percent' => 52],
-                                        8  => ['color' => '#FF8500', 'percent' => 60],
-                                        9  => ['color' => '#FF8500', 'percent' => 68],
-                                        10 => ['color' => '#FE0000', 'percent' => 76],
-                                    ];
-                                    $levelStyle = $faceitStyles[$faceit->level] ?? $faceitStyles[1];
-
-                                    $radius = 16;
-                                    $circumference = 2 * 3.14159 * $radius;
-                                    $dashoffset = $circumference - ($levelStyle['percent'] / 100) * $circumference;
-                                @endphp
-
                                 <div
                                     class="p-4 bg-slate-50 rounded-lg border border-slate-100 text-center flex flex-col justify-center relative overflow-hidden group">
                                     <i class="fa-brands fa-faceit absolute -right-4 -bottom-4 text-6xl text-[#FF5500]/10 group-hover:scale-110 transition-transform"></i>
-
                                     <div class="relative z-10 flex flex-col items-center justify-center w-full h-full">
                                         <div class="flex items-center justify-center gap-4">
-
-                                            <div
-                                                class="relative w-12 h-12 flex items-center justify-center bg-[#1f1f1f] rounded-full shadow-md shrink-0">
-
-                                                <svg class="absolute inset-0 w-full h-full transform rotate-[135deg]"
-                                                     viewBox="0 0 40 40">
-                                                    <circle cx="20" cy="20" r="{{ $radius }}" fill="none"
-                                                            stroke="#333333" stroke-width="4"></circle>
-
-                                                    <circle cx="20" cy="20" r="{{ $radius }}" fill="none"
-                                                            stroke="{{ $levelStyle['color'] }}" stroke-width="4"
-                                                            stroke-dasharray="{{ $circumference }}"
-                                                            stroke-dashoffset="{{ $dashoffset }}"
-                                                            stroke-linecap="round"></circle>
-                                                </svg>
-
-                                                <div class="relative z-10 font-black text-lg"
-                                                     style="color: {{ $levelStyle['color'] }};">
-                                                    {{ $faceit->level }}
-                                                </div>
-                                            </div>
-
-                                            <div class="text-left flex flex-col justify-center" style="line-height: 3px">
+                                            <div class="faceit-icon lvl-{{ $faceit->level }}"></div>
+                                            <div class="text-left flex flex-col justify-center">
                                                 <div class="block text-2xl font-black text-slate-900 leading-none">
                                                     {{ $faceit->elo }}
                                                 </div>
-                                                <div class="text-[10px] font-bold text-[#FF5500] uppercase block mt-1">
-                                                    FaceIT
-                                                </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
                             @endif
                         </div>
                     </div>
-
-
                     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                         <div
                             class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
@@ -202,27 +188,27 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div
-                            class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
-                                Turnir ushın tólemler
-                            </h3>
-                        </div>
-                        <div class="p-6 text-center text-slate-500">
-                            <div class="py-6">
-                                <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                                <p class="text-sm">Házirgi waqıtta sizge tiyisli bolǵan invoyslar tabılmadı.</p>
-                                <p class="text-xs mt-1 text-slate-400">
-                                    Turnir túrine qarap (pullı yamasa pulsız) komandańızdı turnirden dizimnen
-                                    ótkerseńiz, invoyslar avtomatikalıq túrde payda boladı.
-                                </p>
+                    @if(auth()->user()->priority == '1')
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div
+                                class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
+                                    Turnir ushın tólemler
+                                </h3>
+                            </div>
+                            <div class="p-6 text-center text-slate-500">
+                                <div class="py-6">
+                                    <i class="fa-regular fa-folder-open text-4xl text-slate-300 mb-3"></i>
+                                    <p class="text-sm">Házirgi waqıtta sizge tiyisli bolǵan invoyslar tabılmadı.</p>
+                                    <p class="text-xs mt-1 text-slate-400">
+                                        Turnir túrine qarap (pullı yamasa pulsız) komandańızdı turnirden dizimnen
+                                        ótkerseńiz, invoyslar avtomatikalıq túrde payda boladı.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
+                    @endif
                 </div>
             </div>
         </div>

@@ -102,11 +102,11 @@
                     <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
                         <a href="{{ route('teams.index') }}"
                            class="px-6 py-2.5 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-200 transition-colors">
-                            Bekor qilish
+                            Biykar etiw
                         </a>
                         <button type="submit"
                                 class="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold shadow-sm transition-all active:scale-95 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            Saqlash
+                            Jaratıw
                         </button>
                     </div>
                 </form>

@@ -9,6 +9,6 @@ class University extends Model
 {
     public function teams(): HasMany
     {
-        return $this->hasMany(Team::class, 'university_id', 'id');
+        return $this->hasMany(Team::class, 'form_id', 'id');
     }
 }

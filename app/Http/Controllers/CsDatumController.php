@@ -13,6 +13,11 @@ class CsDatumController extends Controller
         return view('score_live');
     }
 
+    public function setka()
+    {
+        return view('setka');
+    }
+
     public function get($id)
     {
         $datum = CsDatum::findOrFail($id);

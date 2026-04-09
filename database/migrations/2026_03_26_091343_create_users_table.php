@@ -9,17 +9,16 @@ return new class extends Migration {
     {
         Schema::create('users', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->unique()->primary();
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('real_name')->nullable();
-            $table->unsignedInteger('hemis_id')->nullable();
             $table->text('profile_url');
             $table->text('steam_avatar');
             $table->text('user_photo')->nullable();
             $table->string('country')->default('UZ');
             $table->string('pos')->default('user');
-            $table->json('rol')->default(json_encode(['user']));
             $table->json('faceit')->nullable();
-            $table->foreignId('group_id')->nullable()->constrained('groups')->cascadeOnDelete();
+            $table->integer('elo')->default(500);
+            $table->enum('priority', ['1', '0'])->default('0');
             $table->rememberToken();
             $table->timestamps();
         });

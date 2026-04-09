@@ -12,10 +12,12 @@ return new class extends Migration {
             $table->string('name');
             $table->text('desc')->nullable();
             $table->enum('type', [
-                'Single Elimination',
-                'Double Elimination',
-                'Swiss System'
-            ])->default('Single Elimination');
+                'single_elimination',
+                'double_elimination',
+                'swiss_system',
+                'gsl_groups',
+                'group_system',
+            ])->default('single_elimination');
             $table->enum('status', ['upcoming', 'live', 'completed'])->default('upcoming');
             $table->integer('max_teams')->default(16);
             $table->timestamp('started_at')->nullable();

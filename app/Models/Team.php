@@ -4,12 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Team extends Model
 {
     protected $fillable = [
-        'name', 'tag', 'logo', 'university_id', 'creator_id', 'captain_id', 'join_url', 'status'
+        'name', 'tag', 'logo', 'form_id', 'creator_id', 'captain_id', 'join_url', 'status'
     ];
+
+    public function captain(): HasOne
+    {
+        return $this->hasOne(User::class, 'id', 'creator_id');
+    }
+
+    public function players(): HasMany
+    {
+        return $this->hasMany(UserTeam::class, 'team_id', 'id');
+    }
 
     public function gamesAsTeam1(): HasMany
     {

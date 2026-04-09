@@ -12,11 +12,11 @@
                     </p>
                 </div>
 
-                <a href="{{ route('teams.create') }}"
+                {{--<a href="{{ route('teams.create') }}"
                    class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all active:scale-95 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                     <i class="fa-solid fa-plus text-sm"></i>
                     <span>Komanda qosıw</span>
-                </a>
+                </a>--}}
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
@@ -80,7 +80,8 @@
                                 </td>
 
                                 <td class="px-6 py-4 text-center">
-                                    {{ number_format(($team->team->wins_count / ($team->team->all_games->count() == 0 ? 1 : $team->team->all_games->count()) * 100), 2) }}%
+                                    {{ number_format(($team->team->wins_count / ($team->team->all_games->count() == 0 ? 1 : $team->team->all_games->count()) * 100), 2) }}
+                                    %
                                 </td>
 
                                 <td class="px-6 py-4 text-center font-semibold text-slate-600">
@@ -99,7 +100,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-12 text-center">
+                                <td colspan="8" class="px-6 py-12 text-center">
                                     <div
                                         class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-4">
                                         <i class="fa-solid fa-users-slash text-3xl"></i>
