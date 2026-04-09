@@ -37,6 +37,7 @@ class SteamAuthController extends Controller
                 $faceitLevel = $data['games']['cs2']['skill_level'] ?? null;
                 $faceitElo = $data['games']['cs2']['faceit_elo'] ?? null;
             }
+            dd($steamUser);
             $user = User::updateOrCreate(
                 ['id' => $steamId64],
                 [
