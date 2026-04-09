@@ -21,7 +21,9 @@ class Game extends Model
     ];
     protected $casts = [
         'confirmed' => 'array',
+        'veto' => 'array',
     ];
+
     public function team1(): HasOne
     {
         return $this->hasOne(Team::class, 'id', 'team_1_id');

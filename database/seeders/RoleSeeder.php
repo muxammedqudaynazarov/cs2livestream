@@ -156,7 +156,7 @@ class RoleSeeder extends Seeder
             ]);
         }
 
-        // Turnirlarga xaritalarni biriktirish (tournament_maps)
+       /* // Turnirlarga xaritalarni biriktirish (tournament_maps)
         foreach ([$tournament1_id, $tournament2_id] as $t_id) {
             foreach ($mapIds as $m_id) {
                 DB::table('tournament_maps')->insert(['tournament_id' => $t_id, 'map_id' => $m_id]);
@@ -264,6 +264,6 @@ class RoleSeeder extends Seeder
                     'created_at' => now(), 'updated_at' => now(),
                 ]);
             }
-        }
+        }*/
     }
 }
