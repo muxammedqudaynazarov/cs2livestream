@@ -21,6 +21,7 @@ Route::get('/setka', [CsDatumController::class, 'setka']);
 Route::get('login/steam', [SteamAuthController::class, 'redirectToSteam'])->name('auth.steam');
 Route::get('login/steam/callback', [SteamAuthController::class, 'handleSteamCallback']);
 
+
 Auth::routes();
 Route::get('/login', function () {
     return redirect()->route('auth.steam');
