@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CsDatumController;
+use App\Http\Controllers\GameController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,3 +10,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 //Route::post('/livestream/gsi', [CsDatumController::class, 'livestream']);
+Route::get('/match/{id}/matchzy-config', [GameController::class, 'matchzyConfig']);

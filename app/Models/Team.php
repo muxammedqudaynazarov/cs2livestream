@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Team extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'name', 'tag', 'logo', 'form_id', 'creator_id', 'captain_id', 'join_url', 'status'
     ];
 
     public function captain(): HasOne
     {
-        return $this->hasOne(User::class, 'id', 'creator_id');
+        return $this->hasOne(User::class, 'id', 'captain_id');
     }
 
     public function players(): HasMany
