@@ -109,20 +109,13 @@
 
                 <div class="hidden md:flex items-center space-x-1">
                     <a href="{{ route('home') }}"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600  @if(request()->is('home')) bg-blue-50 @endif">
-                        Bas meyu
-                    </a>
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 @if(request()->is('home')) bg-blue-50 @endif">Bas
+                        meyu</a>
                     <a href="{{ route('matchmaking.index') }}"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">
-                        Matchmaking
-                    </a>
-                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">
-                        Turnirler
-                    </a>
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">Matchmaking</a>
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium text-blue-600">Turnirler</a>
                     <a href="{{ route('teams.index') }}"
-                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 @if(request()->is('teams*')) bg-blue-50 @endif">
-                        Komandalar
-                    </a>
+                       class="px-3 py-2 rounded-md text-sm font-medium text-blue-600 @if(request()->is('teams*')) bg-blue-50 @endif">Komandalar</a>
                 </div>
             </div>
 
@@ -133,9 +126,7 @@
                                 class="flex items-center gap-3 cursor-pointer p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition-all focus:outline-none">
                             <div class="text-right hidden sm:block">
                                 <p class="text-sm font-bold text-slate-900 leading-none">{{ Auth::user()->name }}</p>
-                                <p class="text-[10px] font-bold text-blue-600 uppercase mt-1 tracking-wider">
-                                    {{ Auth::user()->pos ?? 'O\'yinchi' }}
-                                </p>
+                                <p class="text-[10px] font-bold text-blue-600 uppercase mt-1 tracking-wider">{{ Auth::user()->pos ?? 'O\'yinchi' }}</p>
                             </div>
                             <img class="h-9 w-9 rounded-full object-cover border border-slate-200 shadow-sm"
                                  src="{{ Auth::user()->steam_avatar ?? '/images/avatar.jpg' }}" alt="Avatar">
@@ -158,21 +149,15 @@
                              class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-[100] overflow-hidden">
 
                             <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                                <p class="text-xs text-slate-800 font-medium uppercase tracking-wider">
-                                    {{ Auth::user()->name }}
-                                </p>
+                                <p class="text-xs text-slate-800 font-medium uppercase tracking-wider">{{ Auth::user()->name }}</p>
                                 <p class="text-slate-400 truncate" style="font-size: x-small">{{ Auth::user()->id }}</p>
                             </div>
 
                             <div class="py-1">
                                 <a href="/home"
-                                   class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                                    <span>Kabinet</span>
-                                </a>
+                                   class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"><span>Kabinet</span></a>
                                 <a href="/invoices"
-                                   class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
-                                    <span>Ótkerilgen tólemler</span>
-                                </a>
+                                   class="group flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"><span>Ótkerilgen tólemler</span></a>
                             </div>
 
                             <div class="border-t border-slate-100 pt-1">
@@ -189,8 +174,7 @@
                 @else
                     <a href="{{ route('auth.steam') }}"
                        class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm">
-                        <i class="fab fa-steam text-lg"></i>
-                        Steam menen kiriw
+                        <i class="fab fa-steam text-lg"></i> Steam menen kiriw
                     </a>
                 @endauth
             </div>
@@ -204,27 +188,94 @@
 
 @yield('script')
 
+{{-- ======================================================= --}}
+{{-- 1. GLOBAL O'YIN QIDIRUVCHI (FACEIT MODAL) --}}
+{{-- ======================================================= --}}
+@auth
+    @php
+        $activeMatchId = null;
+
+        // FOYDALANUVCHI JAMOASINI ANIQLASH:
+        // E'tibor bering: O'zingizni bazangizga qarab teamId ni olyapmiz.
+        // Ikkala eng ko'p tarqalgan variantni yozib qo'ydim:
+        $teamId = Auth::user()->team_id ?? (Auth::user()->team->id ?? null);
+
+        // JORIY SAHIFANI TEKSHIRISH: (Agar Veto xonasida bo'lsa modal chiqarmaymiz)
+        $isMatchPage = request()->is('match/*') || request()->is('matchmaking*');
+
+        if ($teamId && !$isMatchPage) {
+            // Shu jamoa ishtirokidagi Kutilayotgan o'yinni izlaymiz
+            $activeGame = \App\Models\Game::whereIn('status', ['waiting', 'picking'])
+                ->where(function($query) use ($teamId) {
+                    $query->where('team_1_id', $teamId)
+                          ->orWhere('team_2_id', $teamId);
+                })->first();
+
+            if ($activeGame) {
+                $activeMatchId = $activeGame->id;
+            }
+        }
+    @endphp
+
+    {{-- AGAR O'YIN TOPILSA, MODAL CHIQARAMIZ --}}
+    @if($activeMatchId)
+        <div x-data="{ show: true }"
+             x-init="setTimeout(() => { document.getElementById('matchFoundAudio')?.play().catch(e => console.log('Brauzer audioni blokladi')); }, 100)"
+             x-cloak
+             x-show="show"
+             class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/90 backdrop-blur-md">
+
+            <div
+                class="bg-slate-900 border border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.2)] p-8 md:p-12 rounded-3xl text-center max-w-lg w-full transform transition-all"
+                x-show="show"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-75"
+                x-transition:enter-end="opacity-100 scale-100">
+
+                <div class="relative w-32 h-32 mx-auto mb-8">
+                    <div class="absolute inset-0 border-4 border-emerald-500/20 rounded-full"></div>
+                    <div
+                        class="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div class="absolute inset-0 flex items-center justify-center bg-emerald-500/10 rounded-full">
+                        <i class="fa-solid fa-trophy text-5xl text-emerald-500 drop-shadow-[0_0_10px_rgba(16,185,129,0.8)]"></i>
+                    </div>
+                </div>
+
+                <h2 class="text-4xl font-black text-white uppercase tracking-widest mb-3 animate-pulse">
+                    OYÍN JARATÍLDÍ!
+                </h2>
+                <p class="text-slate-400 text-lg mb-10">
+                    Oyın tabıldı hám házirde oyın kartaların tańlaw processi baslanıw aldında, kabinetke ótseńiz?
+                </p>
+
+                <a href="/matchmaking/{{ $activeMatchId }}"
+                   class="block w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xl uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] hover:-translate-y-1">
+                    KABINETKE KIRIW
+                </a>
+
+                <audio id="matchFoundAudio" src="/sounds/match_found.mp3" preload="auto"></audio>
+            </div>
+        </div>
+    @endif
+@endauth
+
+
+{{-- ======================================================= --}}
+{{-- 2. TOASTR BARKARORLIK QISMI --}}
+{{-- ======================================================= --}}
 @php
     $toastType = '';
     $toastMessage = '';
     $toastTitle = '';
 
     if(session('success')) {
-        $toastType = 'success';
-        $toastTitle = 'Qutlıqlaymız!';
-        $toastMessage = session('success');
+        $toastType = 'success'; $toastTitle = 'Qutlıqlaymız!'; $toastMessage = session('success');
     } elseif(session('error')) {
-        $toastType = 'error';
-        $toastTitle = 'Qátelik payda boldı!';
-        $toastMessage = session('error');
+        $toastType = 'error'; $toastTitle = 'Qátelik payda boldı!'; $toastMessage = session('error');
     } elseif(session('info')) {
-        $toastType = 'info';
-        $toastTitle = 'Maǵlıwmat ushın';
-        $toastMessage = session('info');
+        $toastType = 'info'; $toastTitle = 'Maǵlıwmat ushın'; $toastMessage = session('info');
     } elseif(session('warning')) {
-        $toastType = 'warning';
-        $toastTitle = 'Dıqqat etiń!';
-        $toastMessage = session('warning');
+        $toastType = 'warning'; $toastTitle = 'Dıqqat etiń!'; $toastMessage = session('warning');
     }
 @endphp
 

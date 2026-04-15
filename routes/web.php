@@ -34,6 +34,7 @@ Route::patch('/teams/{team}/regenerate-url', [TeamController::class, 'regenerate
 Route::get('/join/{token}', [TeamController::class, 'joinTeam'])->name('teams.join')->middleware('auth');
 Route::post('/join/{token}', [TeamController::class, 'joinTeamPost'])->name('teams.join.post')->middleware('auth');
 Route::get('/pick', [HomeController::class, 'pick']);
+Route::get('/api/user/active-match', [MatchmakingController::class, 'checkActiveMatch'])->middleware('auth');
 
 Route::prefix('teams/{team}')->name('team.')->group(function () {
     Route::patch('/players/{player}/captain', [UserTeamController::class, 'makeCaptain'])->name('make_captain');
@@ -43,7 +44,9 @@ Route::prefix('teams/{team}')->name('team.')->group(function () {
 });
 
 Route::get('/match/{id}/veto', [MatchmakingController::class, 'show']);
+Route::get('/match/create', [MatchmakingController::class, 'create']);
 Route::post('/match/{id}/accept', [MatchmakingController::class, 'accept']); // YANGI
 Route::post('/match/{id}/veto/action', [MapController::class, 'action']);
 Route::post('/match/{id}/veto/auto', [MapController::class, 'autoAction']);
+Route::post('/match/{id}/veto/side', [MapController::class, 'pickSide']);
 Route::get('/api/match/{id}/status', [MatchmakingController::class, 'statusApi']); // YANGI (real-time tekshirish uchun)

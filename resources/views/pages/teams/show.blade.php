@@ -105,7 +105,7 @@
                                 <div class="flex flex-col items-center justify-center px-2">
                                     <p class="text-[9px] font-bold text-slate-400 uppercase mb-1">K/D ratio</p>
                                     <p class="text-sm font-black text-slate-800 leading-none h-[24px] flex items-center">
-                                        {{ number_format($player->user->kd ?? 0, 2) }}
+                                        {{ number_format($player->ratio ?? 0, 2) }}
                                     </p>
                                 </div>
                             </div>

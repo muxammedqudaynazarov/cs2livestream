@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -31,4 +33,9 @@ class User extends Authenticatable
     protected $hidden = [
         'pos', 'rol', 'user_photo',
     ];
+
+    public function team(): HasOne
+    {
+        return $this->hasOne(Team::class, 'captain_id', 'id');
+    }
 }
